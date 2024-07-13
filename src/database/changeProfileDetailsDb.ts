@@ -1,7 +1,7 @@
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { users } from "../schema";
+import { users, UsersSelect } from "../schema";
 import { Pool } from "pg";
-import { eq } from "drizzle-orm";
+import { eq, isNotNull } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { validateEmail, validatePassword } from "../util/validation";
 
@@ -15,6 +15,11 @@ export class ChangeProfileDetailsDb {
     return existingUsers.length > 0 && existingUsers[0].id !== userId;
   }
 
+  private async getUserById(userId: number): Promise<UsersSelect> {
+    const existingUsers = await this.db.select().from(users).where(eq(users.id, userId));
+    return existingUsers[0];
+  }
+
   public changeProfileDetails = async (
     id: number,
     email?: string,
@@ -22,6 +27,11 @@ export class ChangeProfileDetailsDb {
     phone?: string
   ): Promise<{ error?; message?: string }> => {
     const updateData: Partial<NewUser> = {};
+
+    if (email || password) {
+      const user = await this.getUserById(id);
+      if (user.googleId) return { error: "You cant change email or password because your AUTH was Google" };
+    }
 
     if (email) {
       const emailError = validateEmail(email);

@@ -18,15 +18,19 @@ export class GoogleAuthDb {
   }
 
   public googleAuth = async (googleId: string, email: string, userAgent: string) => {
+    // Check if user exists by Google ID first
     const existingUser = await this.getUserByGoogleId(googleId);
     if (existingUser) {
-      return { user: existingUser };
+      const tokens = await this.generateTokens(existingUser.id, userAgent);
+      return { user: existingUser, ...tokens };
     }
 
+    // Check if email already exists
     if (await this.emailExists(email, googleId)) {
       return { error: "User with this email already exists" };
     }
 
+    // Create new user
     const accountsCount = await this.db.select().from(users).execute();
     const accountsIdGeneration = accountsCount.length + 1;
 
@@ -39,15 +43,15 @@ export class GoogleAuthDb {
 
     await this.db.insert(users).values(newUser).execute();
 
-    ///////////////////////////////////////////////////////
-    // TOKENS
+    const tokens = await this.generateTokens(newUser.id, userAgent);
+    return { success: true, user: newUser, ...tokens };
+  };
 
-    const user = await this.db.select().from(users).where(eq(users.email, email)).execute();
-
-    const accessToken = jwt.sign({ id: user[0].id }, process.env.JWT_SECRET_KEY, {
+  private async generateTokens(userId: number, userAgent: string) {
+    const accessToken = jwt.sign({ id: userId }, process.env.JWT_SECRET_KEY, {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRES,
     });
-    const refreshToken = jwt.sign({ id: user[0].id }, process.env.REFRESH_TOKEN_SECRET, {
+    const refreshToken = jwt.sign({ id: userId }, process.env.REFRESH_TOKEN_SECRET, {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRES,
     });
 
@@ -55,7 +59,7 @@ export class GoogleAuthDb {
     const existingToken = await this.db
       .select()
       .from(refreshTokens)
-      .where(and(eq(refreshTokens.userId, Number(user[0].id)), eq(refreshTokens.device, userAgent)))
+      .where(and(eq(refreshTokens.userId, userId), eq(refreshTokens.device, userAgent)))
       .execute();
 
     let refreshTokenExpiresIn;
@@ -67,7 +71,7 @@ export class GoogleAuthDb {
         .insert(refreshTokens)
         .values({
           id: sessionsIdGeneration,
-          userId: user[0].id,
+          userId: userId,
           token: refreshToken,
           createdAt: sql`CURRENT_TIMESTAMP`,
           expiresIn: sql`NOW() + INTERVAL '7 days'`,
@@ -88,8 +92,8 @@ export class GoogleAuthDb {
         .execute();
     }
 
-    return { success: true, user: newUser, accessToken, refreshToken, refreshTokenExpiresIn };
-  };
+    return { accessToken, refreshToken, refreshTokenExpiresIn };
+  }
 }
 
 type NewUser = {

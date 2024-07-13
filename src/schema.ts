@@ -14,6 +14,7 @@ import {
 // Таблица users
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
+  stripeCustomerId: varchar("stripeCustomerId").unique().notNull(),
   email: varchar("email", { length: 255 }).unique().notNull(),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
   phone: varchar("phone", { length: 20 }),
@@ -21,6 +22,8 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export type UsersSelect = typeof users.$inferSelect;
 
 // Таблица subscriptions
 export const subscriptions = pgTable("subscriptions", {
@@ -81,13 +84,4 @@ export const messages = pgTable("messages", {
   sender: varchar("sender", { length: 50 }).notNull(), // user или famous_person
   messageText: text("message_text").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-export const refreshTokens = pgTable("refreshTokens", {
-  id: integer("id").primaryKey(),
-  userId: integer("userId"),
-  token: text("token"),
-  createdAt: timestamp("createdAt"),
-  expiresIn: date("expiresIn"),
-  device: varchar("device", { length: 200 }),
 });

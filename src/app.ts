@@ -4,6 +4,7 @@ import { ZodError } from "zod";
 import "express-async-errors";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import { BadRequestError } from "./util/customErrors";
 
 export class App {
   public app: Application;
@@ -26,6 +27,8 @@ export class App {
 
     this.app.use((err, req, res, next) => {
       console.error(err.stack);
+
+      if (err instanceof BadRequestError) return res.status(400).json({ error: err.message });
 
       if (err instanceof ZodError) {
         return res.status(422).json({ error: err.message });

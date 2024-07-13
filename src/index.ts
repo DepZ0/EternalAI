@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { App } from "./app";
 import "dotenv/config";
+import Stripe from "stripe";
 import { RegistrationDb } from "./database/registrationDb";
 import { RegistrationService } from "./express/services/registrationService";
 import { RegistrationController } from "./express/controllers/registrationController";
@@ -27,10 +28,16 @@ import { ProfileController } from "./express/controllers/profileController";
 import { GoogleAuthDb } from "./database/googleAuthDb";
 import { GoogleAuthService } from "./express/services/googleAuthService";
 import { GoogleAuthController } from "./express/controllers/googleAuthController";
+import { StripeService } from "./express/services/stripeService";
+import { AuthDataBase } from "./database/authSystemDb";
+import { AuthService } from "./express/services/authSystemService";
+import { AuthController } from "./express/controllers/authController";
 
 async function main() {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   const db = drizzle(pool, { logger: false });
+
+  const stripe = new Stripe(process.env.STRIPE_SECRET);
 
   await migrate(db, { migrationsFolder: "drizzle" });
 
@@ -66,16 +73,13 @@ async function main() {
   const googleAuthService = new GoogleAuthService(googleAuthDb);
   const googleAuthController = new GoogleAuthController(googleAuthService);
 
-  const app = new App(3000, [
-    registrationController,
-    loginController,
-    changeProfileDetailsController,
-    // logoutController,
-    refreshTokenController,
-    // deleteAccountController,
-    profileController,
-    googleAuthController,
-  ]);
+  const stripeService = new StripeService(stripe);
+
+  const authDb = new AuthDataBase(db);
+  const authService = new AuthService(authDb, stripeService);
+  const authController = new AuthController(authService);
+
+  const app = new App(3000, [authController]);
   app.start();
 }
 

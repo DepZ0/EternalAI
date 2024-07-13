@@ -16,10 +16,10 @@ export const GOOGLE_TOKEN_URI = "https://accounts.google.com/o/oauth2/token";
 export const GOOGLE_USER_INFO_URI = "https://www.googleapis.com/oauth2/v1/userinfo";
 
 // Client ID з кроку #3
-export const GOOGLE_CLIENT_ID = process.env.CLIENT_ID;
+export const GOOGLE_CLIENT_ID = "26223775524-dk79bgpi00r7mrs6k0ujbjkmjnnokjvh.apps.googleusercontent.com";
 
 // Client Secret з кроку #3
-export const GOOGLE_CLIENT_SECRET = process.env.CLIENT_SECRET;
+export const GOOGLE_CLIENT_SECRET = "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";
 
 // Посилання з секції "Authorized redirect URIs" з кроку #3
 export const GOOGLE_REDIRECT_URI = "http://localhost:3000/google-auth/google-callback";

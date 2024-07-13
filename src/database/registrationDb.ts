@@ -26,9 +26,6 @@ export class RegistrationDb {
     }
 
     const accountsIdGeneration = (await this.db.select().from(users)).length + 1;
-    const insertUser = async (user: NewUser) => {
-      return this.db.insert(users).values(user);
-    };
 
     const hashedPassword = bcrypt.hashSync(password, 5);
     const newUser: NewUser = {
@@ -36,7 +33,8 @@ export class RegistrationDb {
       email: email,
       passwordHash: hashedPassword,
     };
-    await insertUser(newUser);
+
+    await this.db.insert(users).values(newUser);
   };
 }
 
