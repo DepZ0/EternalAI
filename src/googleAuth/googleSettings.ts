@@ -22,4 +22,4 @@ export const GOOGLE_CLIENT_ID = "26223775524-dk79bgpi00r7mrs6k0ujbjkmjnnokjvh.ap
 export const GOOGLE_CLIENT_SECRET = "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";
 
 // Посилання з секції "Authorized redirect URIs" з кроку #3
-export const GOOGLE_REDIRECT_URI = "http://localhost:3000/google-auth/google-callback";
+export const GOOGLE_REDIRECT_URI = "http://localhost:3000/auth/google-callback";
