@@ -13,10 +13,11 @@ export interface RequestWithUser extends Request {
 export const authenticateToken = (req: RequestWithUser, res: Response, next: NextFunction) => {
   const token = req.cookies.accessToken;
 
-  if (token === null) return res.sendStatus(401).json("Unauthorized");
+  if (!token) return res.status(401).json("Unauthorized");
 
-  const response = verifyToken(token, process.env.REFRESH_TOKEN_SECRET!);
-  if (!response.success) return res.sendStatus(401).json("Unauthorized");
+  const response = verifyToken(token, process.env.JWT_SECRET_KEY!);
+  if (!response.success) return res.status(401).json("Unauthorized");
 
+  req.user = response.decoded as UserPayload;
   next();
 };

@@ -4,20 +4,17 @@ import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { App } from "./app";
 import "dotenv/config";
 import Stripe from "stripe";
-import { ChangeProfileDetailsDb } from "./database/changeProfileDetailsDb";
-import { ChangeProfileDetailsService } from "./express/services/changeProfileDetailsService";
-import { ChangeProfileDetailsController } from "./express/controllers/changeProfileDetailsController";
 import { RefreshTokenDb } from "./database/refreshTokenDb";
 import { RefreshTokenService } from "./express/services/refreshTokenService";
 import { RefreshTokenController } from "./express/controllers/refreshTokenController";
-import { ProfileDb } from "./database/profileDb";
-import { ProfileService } from "./express/services/profileService";
-import { ProfileController } from "./express/controllers/profileController";
 import { StripeService } from "./express/services/stripeService";
 import { AuthDataBase } from "./database/authSystemDb";
 import { AuthService } from "./express/services/authSystemService";
 import { AuthController } from "./express/controllers/authController";
 import { WebhookController } from "./express/controllers/webhookController";
+import { UserDataBase } from "database/userDb";
+import { UserService } from "express/services/userService";
+import { UserController } from "express/controllers/userController";
 
 async function main() {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -27,27 +24,23 @@ async function main() {
 
   await migrate(db, { migrationsFolder: "drizzle" });
 
-  const changeProfileDetailsDb = new ChangeProfileDetailsDb(db, pool);
-  const changeProfileDetailsService = new ChangeProfileDetailsService(changeProfileDetailsDb);
-  const changeProfileDetailsController = new ChangeProfileDetailsController(changeProfileDetailsService);
-
-  const refreshTokenDb = new RefreshTokenDb(db, pool);
-  const refreshTokenService = new RefreshTokenService(refreshTokenDb);
-  const refreshTokenController = new RefreshTokenController(refreshTokenService);
-
-  const profileDb = new ProfileDb(db, pool);
-  const profileService = new ProfileService(profileDb);
-  const profileController = new ProfileController(profileService);
-
   const stripeService = new StripeService(stripe);
+
+  const webhookController = new WebhookController();
 
   const authDb = new AuthDataBase(db);
   const authService = new AuthService(authDb, stripeService);
   const authController = new AuthController(authService);
 
-  const webhookController = new WebhookController();
+  const userDb = new UserDataBase(db);
+  const userService = new UserService(userDb, stripeService);
+  const userController = new UserController(userService);
 
-  const app = new App(3000, [authController, webhookController]);
+  const refreshTokenDb = new RefreshTokenDb(db, pool);
+  const refreshTokenService = new RefreshTokenService(refreshTokenDb);
+  const refreshTokenController = new RefreshTokenController(refreshTokenService);
+
+  const app = new App(3000, [authController, webhookController, userController, refreshTokenController]);
   app.start();
 }
 
