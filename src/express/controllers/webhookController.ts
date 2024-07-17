@@ -1,10 +1,28 @@
 import { RequestHandler } from "express";
 import { Controller } from "./Controller";
 import fs from "fs";
+import { NodePgDatabase } from "drizzle-orm/node-postgres";
+import { stripeEvents, subscriptions, users } from "schema";
+import { eq } from "drizzle-orm";
 
 type InvoicePaidWebhook = {
   data: {
-    id: 1;
+    object: {
+      id: string;
+      customer: string;
+      customer_email: string;
+      created: number;
+      lines: {
+        data: [
+          {
+            period: {
+              start: number;
+              end: number;
+            };
+          }
+        ];
+      };
+    };
   };
   type: "invoice.paid";
 };
@@ -17,7 +35,7 @@ type CustomerDeletedWebhook = {
 type StripeWebhookEvent = CustomerDeletedWebhook | InvoicePaidWebhook;
 
 export class WebhookController extends Controller {
-  constructor() {
+  constructor(private db: NodePgDatabase) {
     super("/webhook");
     this.initializeRoutes();
   }
@@ -28,7 +46,7 @@ export class WebhookController extends Controller {
 
   private stripeWebhook: RequestHandler<{}, {}, StripeWebhookEvent> = async (req, res) => {
     // return status 200 always
-    // СОздать таблицу с эвентами и сохранять все эвенты(боди) которые приходят в базу
+    // Создать таблицу с эвентами и сохранять все эвенты(боди) которые приходят в базу
     // Чекать вид эвента и (изучить что приходит в ответе)
     const body = req.body;
     switch (body.type) {
@@ -37,17 +55,32 @@ export class WebhookController extends Controller {
         await this.stripeCustomerDeleted(body);
         break;
       case "invoice.paid":
-        body.data.id;
+        body.data.object.id;
         await this.stripeInvoicePaid(body);
         break;
     }
 
-    fs.writeFileSync("result.json", JSON.stringify(req.body));
+    // fs.writeFileSync("result.json", JSON.stringify(req.body));
     res.status(200).send("OK");
   };
 
   private stripeInvoicePaid = async (body: InvoicePaidWebhook) => {
-    // logic here
+    // Create Events in DataBase
+    const stripeBody = {
+      eventId: body.data.object.id,
+      type: body.type,
+      data: JSON.stringify(body),
+    };
+    await this.db.insert(stripeEvents).values(stripeBody);
+    // ------------------------------
+    const user = await this.db.select().from(users).where(eq(users.stripeCustomerId, body.data.object.customer));
+
+    const subscriptionsObject = {
+      userId: user[0].id,
+      endDate: new Date(body.data.object.lines.data[0].period.end),
+    };
+    await this.db.insert(subscriptions).values(subscriptionsObject);
+
     return;
   };
 

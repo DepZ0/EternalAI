@@ -85,3 +85,11 @@ export const messages = pgTable("messages", {
   messageText: text("message_text").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export const stripeEvents = pgTable("stripe_events", {
+  id: serial("id").primaryKey(),
+  eventId: varchar("event_id", { length: 255 }).notNull(),
+  type: varchar("type", { length: 255 }).notNull(),
+  data: text("data").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});

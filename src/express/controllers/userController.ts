@@ -13,6 +13,7 @@ export class UserController extends Controller {
   private initializeRoutes = () => {
     this.router.get("/profile", extractAccessToken, authenticateToken, this.getProfile);
     this.router.post("/change-details", extractAccessToken, authenticateToken, this.changeProfileDetails);
+    this.router.post("/buy-sub", extractAccessToken, authenticateToken, this.createPaymentLink);
   };
 
   private getProfile: RequestHandler = async (req: RequestWithUser, res) => {
@@ -33,5 +34,13 @@ export class UserController extends Controller {
     }
 
     return res.status(200).json(result);
+  };
+
+  private createPaymentLink: RequestHandler = async (req: RequestWithUser, res) => {
+    const id = Number(req.user?.id);
+
+    const paymentUrl = String((await this.userService.getPaymentLink(id)).url);
+
+    res.redirect(paymentUrl);
   };
 }

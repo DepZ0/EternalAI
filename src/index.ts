@@ -26,7 +26,7 @@ async function main() {
 
   const stripeService = new StripeService(stripe);
 
-  const webhookController = new WebhookController();
+  const webhookController = new WebhookController(db);
 
   const authDb = new AuthDataBase(db);
   const authService = new AuthService(authDb, stripeService);

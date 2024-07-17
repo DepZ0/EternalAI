@@ -59,6 +59,13 @@ export class UserService {
 
     return { message: "Profile details updated successfully" };
   };
+
+  public getPaymentLink = async (userId: number) => {
+    const customer = await this.userDb.getUserById(userId);
+    const result = await this.stripeService.getStripePaymentLink(customer.stripeCustomerId);
+
+    return result;
+  };
 }
 
 export type NewUser = {
@@ -67,5 +74,3 @@ export type NewUser = {
   phone: string;
   updatedAt: Date;
 };
-
-/// Зафиксить эту хуйню, что то с типами возможно или Зод шалит
