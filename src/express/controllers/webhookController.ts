@@ -77,7 +77,7 @@ export class WebhookController extends Controller {
 
     const subscriptionsObject = {
       userId: user[0].id,
-      endDate: new Date(body.data.object.lines.data[0].period.end),
+      endDate: new Date(body.data.object.lines.data[0].period.end * 1000),
     };
     await this.db.insert(subscriptions).values(subscriptionsObject);
 

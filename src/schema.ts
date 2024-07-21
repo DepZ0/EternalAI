@@ -36,42 +36,13 @@ export const subscriptions = pgTable("subscriptions", {
   active: boolean("active").default(true).notNull(),
 });
 
-// Таблица questions
-export const questions = pgTable("questions", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id")
-    .references(() => users.id)
-    .notNull(),
-  questionText: text("question_text").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-// Таблица answers
-export const answers = pgTable("answers", {
-  id: serial("id").primaryKey(),
-  questionId: integer("question_id")
-    .references(() => questions.id)
-    .notNull(),
-  answerText: text("answer_text").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-// Таблица famous_people
-export const famousPeople = pgTable("famous_people", {
-  id: serial("id").primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  description: text("description"),
-});
-
 // Таблица chats
 export const chats = pgTable("chats", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
     .references(() => users.id)
     .notNull(),
-  famousPersonId: integer("famous_person_id")
-    .references(() => famousPeople.id)
-    .notNull(),
+  famousPerson: varchar("famous_person", { length: 50 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -81,7 +52,7 @@ export const messages = pgTable("messages", {
   chatId: integer("chat_id")
     .references(() => chats.id)
     .notNull(),
-  sender: varchar("sender", { length: 50 }).notNull(), // user или famous_person
+  sender: varchar("sender", { length: 50 }).notNull(), // user or assistant
   messageText: text("message_text").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

@@ -1,2 +1,3 @@
-Create webhook system +
-Create check Out Link +
+Connect OpenAI +
+Enter logic «if user don’t have account | if user have account but don’t have sub | user have account and sub»
+Write doc

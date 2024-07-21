@@ -15,16 +15,27 @@ import { WebhookController } from "./express/controllers/webhookController";
 import { UserDataBase } from "database/userDb";
 import { UserService } from "express/services/userService";
 import { UserController } from "express/controllers/userController";
+import OpenAI from "openai";
+import { OpenAiService } from "express/services/openAiService";
+import { OpenAiController } from "express/controllers/openAiController";
+import { OpenAiDataBase } from "database/openAiDb";
 
 async function main() {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   const db = drizzle(pool, { logger: false });
 
   const stripe = new Stripe(`${process.env.STRIPE_SECRET}`);
+  const openai = new OpenAI({
+    apiKey: process.env.OPEN_AI_SECRET,
+  });
 
   await migrate(db, { migrationsFolder: "drizzle" });
 
   const stripeService = new StripeService(stripe);
+
+  const openAiDataBase = new OpenAiDataBase(db);
+  const openAiService = new OpenAiService(openAiDataBase, openai);
+  const openAiController = new OpenAiController(openAiService);
 
   const webhookController = new WebhookController(db);
 
@@ -36,11 +47,17 @@ async function main() {
   const userService = new UserService(userDb, stripeService);
   const userController = new UserController(userService);
 
-  const refreshTokenDb = new RefreshTokenDb(db, pool);
-  const refreshTokenService = new RefreshTokenService(refreshTokenDb);
-  const refreshTokenController = new RefreshTokenController(refreshTokenService);
+  // const refreshTokenDb = new RefreshTokenDb(db, pool);
+  // const refreshTokenService = new RefreshTokenService(refreshTokenDb);
+  // const refreshTokenController = new RefreshTokenController(refreshTokenService);
 
-  const app = new App(3000, [authController, webhookController, userController, refreshTokenController]);
+  const app = new App(3000, [
+    authController,
+    webhookController,
+    userController,
+    // refreshTokenController,
+    openAiController,
+  ]);
   app.start();
 }
 

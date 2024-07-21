@@ -1,58 +1,9 @@
 {
-  "id": "36e625c6-afe2-478d-8ef7-cae7956a1d4a",
+  "id": "a6cbc4bd-49a5-4f89-aadb-447b729da358",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "5",
   "dialect": "pg",
   "tables": {
-    "answers": {
-      "name": "answers",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "question_id": {
-          "name": "question_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "answer_text": {
-          "name": "answer_text",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "answers_question_id_questions_id_fk": {
-          "name": "answers_question_id_questions_id_fk",
-          "tableFrom": "answers",
-          "tableTo": "questions",
-          "columnsFrom": [
-            "question_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
     "chats": {
       "name": "chats",
       "schema": "",
@@ -69,9 +20,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "famous_person_id": {
-          "name": "famous_person_id",
-          "type": "integer",
+        "famous_person": {
+          "name": "famous_person",
+          "type": "varchar(50)",
           "primaryKey": false,
           "notNull": true
         },
@@ -97,49 +48,8 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
-        },
-        "chats_famous_person_id_famous_people_id_fk": {
-          "name": "chats_famous_person_id_famous_people_id_fk",
-          "tableFrom": "chats",
-          "tableTo": "famous_people",
-          "columnsFrom": [
-            "famous_person_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
         }
       },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "famous_people": {
-      "name": "famous_people",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -198,8 +108,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "questions": {
-      "name": "questions",
+    "stripe_events": {
+      "name": "stripe_events",
       "schema": "",
       "columns": {
         "id": {
@@ -208,14 +118,20 @@
           "primaryKey": true,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
+        "event_id": {
+          "name": "event_id",
+          "type": "varchar(255)",
           "primaryKey": false,
           "notNull": true
         },
-        "question_text": {
-          "name": "question_text",
+        "type": {
+          "name": "type",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "data": {
+          "name": "data",
           "type": "text",
           "primaryKey": false,
           "notNull": true
@@ -229,21 +145,7 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "questions_user_id_users_id_fk": {
-          "name": "questions_user_id_users_id_fk",
-          "tableFrom": "questions",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -313,6 +215,12 @@
           "primaryKey": true,
           "notNull": true
         },
+        "stripeCustomerId": {
+          "name": "stripeCustomerId",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
         "email": {
           "name": "email",
           "type": "varchar(255)",
@@ -356,6 +264,13 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "users_stripeCustomerId_unique": {
+          "name": "users_stripeCustomerId_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "stripeCustomerId"
+          ]
+        },
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,

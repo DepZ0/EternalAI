@@ -8,5 +8,7 @@ declare namespace NodeJS {
     CLIENT_ID: string;
     CLIENT_SECRET: string;
     STRIPE_SECRET: string;
+    OPEN_AI_SECRET: string;
+    OPEN_AI_CHAT_MODEL: string;
   }
 }
