@@ -45,9 +45,6 @@ export class WebhookController extends Controller {
   };
 
   private stripeWebhook: RequestHandler<{}, {}, StripeWebhookEvent> = async (req, res) => {
-    // return status 200 always
-    // Создать таблицу с эвентами и сохранять все эвенты(боди) которые приходят в базу
-    // Чекать вид эвента и (изучить что приходит в ответе)
     const body = req.body;
     switch (body.type) {
       case "customer.deleted":
@@ -60,7 +57,6 @@ export class WebhookController extends Controller {
         break;
     }
 
-    // fs.writeFileSync("result.json", JSON.stringify(req.body));
     res.status(200).send("OK");
   };
 

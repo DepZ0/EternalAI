@@ -25,7 +25,7 @@ export class App {
       this.app.use(controller.path, controller.router);
     });
 
-    this.app.use((err, req, res, next) => {
+    this.app.use((err: any, req: any, res: any, next: any) => {
       console.error(err.stack);
 
       if (err instanceof BadRequestError) return res.status(400).json({ error: err.message });

@@ -14,7 +14,7 @@ export class AuthService {
     // create customer in Stripe +
     // create user in DataBase +
     // generate tokens +
-    // return tokens to controller
+    // return tokens to controller +
 
     const { email, password } = userRegistrationSchema.parse(body);
     const isExist = await this.authDb.getUserByEmail(email);

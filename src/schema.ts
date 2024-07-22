@@ -1,17 +1,5 @@
-import {
-  pgTable,
-  serial,
-  varchar,
-  text,
-  timestamp,
-  integer,
-  boolean,
-  primaryKey,
-  foreignKey,
-  date,
-} from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, timestamp, integer, boolean } from "drizzle-orm/pg-core";
 
-// Таблица users
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   stripeCustomerId: varchar("stripeCustomerId").unique().notNull(),
@@ -25,7 +13,6 @@ export const users = pgTable("users", {
 
 export type UsersSelect = typeof users.$inferSelect;
 
-// Таблица subscriptions
 export const subscriptions = pgTable("subscriptions", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
@@ -36,7 +23,6 @@ export const subscriptions = pgTable("subscriptions", {
   active: boolean("active").default(true).notNull(),
 });
 
-// Таблица chats
 export const chats = pgTable("chats", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
@@ -46,7 +32,6 @@ export const chats = pgTable("chats", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-// Таблица messages
 export const messages = pgTable("messages", {
   id: serial("id").primaryKey(),
   chatId: integer("chat_id")

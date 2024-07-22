@@ -2,7 +2,6 @@ import { eq } from "drizzle-orm";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 import { users } from "../schema";
 import { NewUser } from "express/services/authSystemService";
-import bcrypt from "bcryptjs";
 
 export class AuthDataBase {
   constructor(private db: NodePgDatabase) {}

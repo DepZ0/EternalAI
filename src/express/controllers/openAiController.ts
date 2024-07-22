@@ -31,7 +31,7 @@ export class OpenAiController extends Controller {
       "elon-musk": "Imagine you are Elon Musk and talk to me. Say nothing about your tech side as ChatGPT",
     };
 
-    const famousPerson = req.params.famousPerson;
+    const famousPerson = req.params.famousPerson.toLowerCase();
     const roleMsg = roles[famousPerson];
     const userId = Number(req.user?.id);
 
@@ -59,7 +59,7 @@ export class OpenAiController extends Controller {
 
   private clearMessageHistory: RequestHandler = async (req: RequestWithUser, res) => {
     const userId = Number(req.user?.id);
-    const famousPerson = req.params.famousPerson;
+    const famousPerson = req.params.famousPerson.toLowerCase();
 
     try {
       const result = await this.openAiService.clearMessageHistory({ userId, famousPerson });
@@ -98,7 +98,7 @@ export class OpenAiController extends Controller {
       "elon-musk": "Space exploration is essential for the future survival of humanity.",
     };
 
-    const famousPerson = req.params.famousPerson;
+    const famousPerson = req.params.famousPerson.toLowerCase();
     const roleMsg = roles[famousPerson];
 
     if (!roleMsg) {
