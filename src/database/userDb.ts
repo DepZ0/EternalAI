@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
-import { users, UsersSelect } from "schema";
+import { subscriptions, users, UsersSelect } from "schema";
 
 export class UserDataBase {
   constructor(private db: NodePgDatabase) {}
@@ -13,6 +13,11 @@ export class UserDataBase {
   public async getUserById(userId: number): Promise<UsersSelect> {
     const existingUsers = await this.db.select().from(users).where(eq(users.id, userId));
     return existingUsers[0];
+  }
+
+  public async getSubscriptionByUserId(userId: number) {
+    const subscription = await this.db.select().from(subscriptions).where(eq(subscriptions.userId, userId));
+    return subscription[0];
   }
 
   public async getProfileByEmail(userId: number) {

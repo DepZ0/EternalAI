@@ -1,16 +1,23 @@
 import { OpenAiDataBase } from "database/openAiDb";
+import { UserDataBase } from "database/userDb";
 import OpenAI from "openai";
+import { BadRequestError } from "util/customErrors";
 
 export class OpenAiService {
-  constructor(private openAiDataBase: OpenAiDataBase, private openai: OpenAI) {}
+  constructor(private openAiDataBase: OpenAiDataBase, private userDataBase: UserDataBase, private openai: OpenAI) {}
 
   public sendMessage = async (body: { userId: number; messageText: string; roleMsg: string; famousPerson: string }) => {
     const { userId, messageText, roleMsg, famousPerson } = body;
 
     // Find or create chat
     const chat = await this.openAiDataBase.findOrCreateChat({ userId, famousPerson });
-
     const chatId = chat.id;
+
+    const getAllMessagesForCheckLenght = await this.openAiDataBase.getMessagesByChatId(chatId);
+    if (getAllMessagesForCheckLenght.length >= 10) {
+      const isSubscriprionExist = await this.userDataBase.getSubscriptionByUserId(userId);
+      if (!isSubscriprionExist) throw new BadRequestError("For send me more messages - You need to buy subscription");
+    }
 
     const completion = await this.openai.chat.completions.create({
       messages: [
@@ -40,12 +47,20 @@ export class OpenAiService {
     }
 
     const getAllMessages = await this.openAiDataBase.getMessagesByChatId(chatId);
+
     return getAllMessages;
   };
 
   public clearMessageHistory = async (body: { userId: number; famousPerson: string }) => {
     const { userId, famousPerson } = body;
     const chat = await this.openAiDataBase.findOrCreateChat({ userId, famousPerson });
+
+    const getAllMessagesForCheckLenght = await this.openAiDataBase.getMessagesByChatId(chat.id);
+    if (getAllMessagesForCheckLenght.length >= 10) {
+      const isSubscriprionExist = await this.userDataBase.getSubscriptionByUserId(userId);
+      if (!isSubscriprionExist)
+        throw new BadRequestError("For send me more messages or clear message history - You need to buy subscription");
+    }
 
     try {
       const clearMessages = await this.openAiDataBase.clearMessageHistory(chat.id, famousPerson, userId);
@@ -54,4 +69,6 @@ export class OpenAiService {
       return error;
     }
   };
+
+  public getTestChat = async (body: { messageText: string; roleMsg: string; famousPerson: string }) => {};
 }

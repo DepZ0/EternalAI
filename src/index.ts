@@ -33,10 +33,6 @@ async function main() {
 
   const stripeService = new StripeService(stripe);
 
-  const openAiDataBase = new OpenAiDataBase(db);
-  const openAiService = new OpenAiService(openAiDataBase, openai);
-  const openAiController = new OpenAiController(openAiService);
-
   const webhookController = new WebhookController(db);
 
   const authDb = new AuthDataBase(db);
@@ -47,15 +43,18 @@ async function main() {
   const userService = new UserService(userDb, stripeService);
   const userController = new UserController(userService);
 
-  // const refreshTokenDb = new RefreshTokenDb(db, pool);
-  // const refreshTokenService = new RefreshTokenService(refreshTokenDb);
-  // const refreshTokenController = new RefreshTokenController(refreshTokenService);
+  const openAiDataBase = new OpenAiDataBase(db);
+  const openAiService = new OpenAiService(openAiDataBase, userDb, openai);
+  const openAiController = new OpenAiController(openAiService);
+
+  const refreshTokenService = new RefreshTokenService(userDb);
+  const refreshTokenController = new RefreshTokenController(refreshTokenService);
 
   const app = new App(3000, [
     authController,
     webhookController,
     userController,
-    // refreshTokenController,
+    refreshTokenController,
     openAiController,
   ]);
   app.start();
