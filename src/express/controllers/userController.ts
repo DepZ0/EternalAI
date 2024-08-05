@@ -24,9 +24,9 @@ export class UserController extends Controller {
   };
 
   private changeProfileDetails: RequestHandler = async (req: RequestWithUser, res) => {
-    const { email, password, phone } = req.body;
+    const { email, name, password, phone } = req.body;
     const id = Number(req.user?.id);
-    const result = await this.userService.changeProfileDetails({ id, email, password, phone });
+    const result = await this.userService.changeProfileDetails({ id, email, name, password, phone });
 
     if (req.body.password) {
       res.cookie("refreshToken", { maxAge: -1, httpOnly: true });

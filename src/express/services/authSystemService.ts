@@ -22,9 +22,11 @@ export class AuthService {
 
     const stripeCustomer = await this.stripeService.createStripeCustomer(email);
 
+    const name = email.split("@")[0];
     const hashedPassword = bcrypt.hashSync(password, 5);
     const insertedUser = await this.authDb.createAndGetUser({
       email,
+      name,
       password: hashedPassword,
       stripeCustomerId: stripeCustomer.id,
     });
@@ -48,8 +50,8 @@ export class AuthService {
     return tokens;
   }
 
-  public async googleAuth(body: { googleId: string; email: string }) {
-    const { googleId, email } = userGoogleRegistrationSchema.parse(body);
+  public async googleAuth(body: { googleId: string; email: string; name: string }) {
+    const { googleId, email, name } = userGoogleRegistrationSchema.parse(body);
     const isExistEmail = await this.authDb.getUserByEmail(email);
     const isExistGoogleId = await this.authDb.getUserByGoogleId(googleId);
 
@@ -62,6 +64,7 @@ export class AuthService {
       const stripeCustomer = await this.stripeService.createStripeCustomer(email);
       user = await this.authDb.googleAuth({
         googleId,
+        name,
         email,
         stripeCustomerId: stripeCustomer.id,
       });
@@ -75,6 +78,7 @@ export class AuthService {
 
 export type NewUser = {
   googleId: string;
+  name: string;
   email: string;
   passwordHash: string;
   stripeCustomerId: string;

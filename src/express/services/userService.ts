@@ -1,7 +1,7 @@
 import { UserDataBase } from "database/userDb";
 import { StripeService } from "./stripeService";
 import bcrypt from "bcryptjs";
-import { validateEmail, validatePassword } from "util/validation";
+import { validateEmail, validateName, validatePassword } from "util/validation";
 
 export class UserService {
   constructor(private userDb: UserDataBase, private stripeService: StripeService) {}
@@ -14,10 +14,16 @@ export class UserService {
     }
   }
 
-  public changeProfileDetails = async (body: { id: number; email: string; password?: string; phone?: string }) => {
+  public changeProfileDetails = async (body: {
+    id: number;
+    email: string;
+    name?: string;
+    password?: string;
+    phone?: string;
+  }) => {
     const updateData: Partial<NewUser> = {};
 
-    const { id, email, password, phone } = body;
+    const { id, email, name, password, phone } = body;
 
     if (email || password) {
       const user = await this.userDb.getUserById(id);
@@ -34,6 +40,15 @@ export class UserService {
       }
 
       updateData.email = email;
+    }
+
+    if (name) {
+      const nameError = validateName(name);
+      if (nameError) {
+        return { error: nameError };
+      }
+
+      updateData.name = name;
     }
 
     if (password) {
@@ -57,7 +72,8 @@ export class UserService {
 
     await this.userDb.changeProfileDetails(updateData, id);
 
-    return { message: "Profile details updated successfully" };
+    const result = await this.getProfile(body.id);
+    return result;
   };
 
   public getPaymentLink = async (userId: number) => {
@@ -70,6 +86,7 @@ export class UserService {
 
 export type NewUser = {
   email: string;
+  name: string;
   passwordHash: string;
   phone: string;
   updatedAt: Date;

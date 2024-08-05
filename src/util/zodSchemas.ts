@@ -6,6 +6,7 @@ export const userRegistrationSchema = z.object({
 });
 
 export const userGoogleRegistrationSchema = z.object({
+  name: z.string().min(1).max(60),
   email: z.string().email().min(1),
   googleId: z.string().min(1),
 });

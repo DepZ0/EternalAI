@@ -24,6 +24,7 @@ export class UserDataBase {
     const findProfile = await this.db.select().from(users).where(eq(users.id, userId));
 
     const profile = {
+      name: findProfile[0].name,
       email: findProfile[0].email,
       phone: findProfile[0].phone,
       createdAt: findProfile[0].createdAt,

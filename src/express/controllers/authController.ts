@@ -104,8 +104,8 @@ export class AuthController extends Controller {
 
       const userInfo = response.data;
 
-      const { id: googleId, email } = userInfo;
-      const { accessToken, refreshToken } = await this.authService.googleAuth({ googleId, email });
+      const { id: googleId, email, name } = userInfo;
+      const { accessToken, refreshToken } = await this.authService.googleAuth({ googleId, email, name });
 
       res.cookie("refreshToken", refreshToken, { maxAge: 1000 * 60 * 120, httpOnly: true });
       res.cookie("accessToken", accessToken, { maxAge: 1000 * 60 * 120, httpOnly: true });

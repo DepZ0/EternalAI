@@ -17,10 +17,12 @@ export class AuthDataBase {
   }
 
   public async createAndGetUser({
+    name,
     email,
     password,
     stripeCustomerId,
   }: {
+    name: string;
     email: string;
     password: string;
     stripeCustomerId: string;
@@ -28,6 +30,7 @@ export class AuthDataBase {
     const user = await this.db
       .insert(users)
       .values({
+        name: name, // ------------------------------ FIX
         email: email,
         passwordHash: password,
         stripeCustomerId: stripeCustomerId,
@@ -41,10 +44,12 @@ export class AuthDataBase {
 
   public googleAuth = async ({
     googleId,
+    name,
     email,
     stripeCustomerId,
   }: {
     googleId: string;
+    name: string;
     email: string;
     stripeCustomerId: string;
   }) => {
@@ -52,6 +57,7 @@ export class AuthDataBase {
 
     const newUser: NewUser = {
       googleId: googleId,
+      name: name, // ------------------------------ FIX
       email: email,
       passwordHash: "",
       stripeCustomerId: stripeCustomerId,

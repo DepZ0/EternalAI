@@ -22,7 +22,7 @@ export function validateName(name: string) {
 export function validateSurname(surname: string) {
   if (!nameSurnameRegex.test(surname)) {
     return {
-      error: "Invalid surname. It should contain only letters and a single space, and be 1 to 50 characters long",
+      error: "Invalid surname. It should contain only letters and a single space, and be 1 to 60 characters long",
     };
   }
   return null;

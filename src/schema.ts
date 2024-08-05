@@ -4,6 +4,7 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   stripeCustomerId: varchar("stripeCustomerId").unique().notNull(),
   email: varchar("email", { length: 255 }).unique().notNull(),
+  name: varchar("name", { length: 60 }).unique().notNull(),
   passwordHash: varchar("password_hash", { length: 255 }).notNull(),
   phone: varchar("phone", { length: 20 }),
   googleId: varchar("google_id", { length: 255 }),
