@@ -57,7 +57,7 @@ export class AuthDataBase {
 
     const newUser: NewUser = {
       googleId: googleId,
-      name: name, // ------------------------------ FIX
+      name: name,
       email: email,
       passwordHash: "",
       stripeCustomerId: stripeCustomerId,
@@ -67,6 +67,12 @@ export class AuthDataBase {
 
     return user[0];
   };
+
+  public async updateGoogleId(userId: number, googleId: string) {
+    const user = await this.db.update(users).set({ googleId }).where(eq(users.id, userId)).returning();
+
+    return user[0];
+  }
 
   public login = async (email: string, password: string) => {
     const user = await this.db.select().from(users).where(eq(users.email, email));

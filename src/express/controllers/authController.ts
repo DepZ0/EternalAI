@@ -11,6 +11,8 @@ import {
   GOOGLE_USER_INFO_URI,
 } from "../../googleAuth/googleSettings";
 import axios from "axios";
+import { authenticateToken } from "util/authenticateToken";
+import { extractAccessToken } from "util/extractTokens";
 
 export class AuthController extends Controller {
   constructor(private authService: AuthService) {
@@ -27,8 +29,9 @@ export class AuthController extends Controller {
     this.router.get("/google-callback", this.googleCallback);
     this.router.get("/google-result", this.googleResult);
     // ---
-    // login
+
     this.router.post("/login", this.login);
+    this.router.post("/logout", extractAccessToken, authenticateToken, this.logout);
   };
   // standart auth -----------------------------------------------------------------------------------------------------
   private registration: RequestHandler = async (req, res) => {
@@ -49,6 +52,13 @@ export class AuthController extends Controller {
     res.cookie("accessToken", accessToken, { maxAge: 1000 * 60 * 120, httpOnly: true });
 
     return res.status(200).json({ message: "Login successful" });
+  };
+
+  private logout: RequestHandler = async (req, res) => {
+    res.cookie("refreshToken", { maxAge: -1, httpOnly: true });
+    res.cookie("accessToken", { maxAge: -1, httpOnly: true });
+
+    res.redirect("/main");
   };
 
   // -----------------------------------------------------------------------------------------------------

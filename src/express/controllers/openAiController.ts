@@ -7,7 +7,7 @@ import { BadRequestError } from "util/customErrors";
 
 export class OpenAiController extends Controller {
   constructor(private openAiService: OpenAiService) {
-    super("/");
+    super("/chat");
     this.initializeRoutes();
   }
 

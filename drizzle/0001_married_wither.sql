@@ -1,0 +1,1 @@
+ALTER TABLE "subscriptions" ADD COLUMN "phone" varchar(35) NOT NULL;

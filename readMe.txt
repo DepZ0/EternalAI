@@ -35,15 +35,30 @@ Buy subscription {
     after successful payment you can see redirect to /success
 }
 
+Change payment Card {
+    Lets send our request to /update-payment-method
+    and point to body "paymentMethodId",
+    this "paymentMethodId" we can get from Front,
+    Front need to use stripe.js to get Card details
+    and return to us "paymentMethodId", it will be
+    as "pm_1PuDcrLbBDX36PAya7KeCl50" or "pm_1PuDfJLbBDX36PAydTLk4KSQ".
+    
+    EXAMPLE [
+        {
+            paymentMethodId: "pm_1PuDcrLbBDX36PAya7KeCl50"
+        }
+    ]
+}
+
 Chatting with Famous People's {
-    Make POST request to /name-surname and set body {message: Hello, how are you?},
+    Make POST request to /chat/name-surname and set body {message: Hello, how are you?},
     After this request you will get answer from server with ALL your chat with selected bot.
     
     Available Famous People's [ steve-jobs, stephan-bandera, britney-spears, joanne-rowling, elon-musk]
 }
 
 Clearing chats {
-    For clear chat make DELETE request to /name-surname/clear-chat-history
+    For clear chat make DELETE request to /chat/name-surname/clear-chat-history
 
     Available Famous People's [ steve-jobs, stephan-bandera, britney-spears, joanne-rowling, elon-musk]
 }
@@ -61,6 +76,7 @@ Notice:
 
 Available routes - [ /auth/google-auth, /auth/sign-up, /auth/login,
                      /profile, /change-details, /refresh-token, 
-                     /buy-sub, /name-surname, /name-surname/clear-chat-history ]
+                     /buy-sub, /update-payment-method, /chat/name-surname, 
+                     /chat/name-surname/clear-chat-history ]
 
 Available Famous People's [ steve-jobs, stephan-bandera, britney-spears, joanne-rowling, elon-musk ].

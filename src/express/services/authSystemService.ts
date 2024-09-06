@@ -38,10 +38,8 @@ export class AuthService {
 
   public async login(body: { email: string; password: string }) {
     const { email, password } = userRegistrationSchema.parse(body);
-    const user = await this.authDb.login(email, password);
-
-    const isExist = await this.authDb.getUserByEmail(email);
-    if (!isExist) throw new BadRequestError(`User with email'${email}' not found`);
+    const user = await this.authDb.getUserByEmail(email);
+    if (!user) throw new BadRequestError(`User with email '${email}' not found`);
 
     const passwordIsValid = bcrypt.compareSync(password, user.passwordHash);
     if (!passwordIsValid) throw new BadRequestError("Incorrect password");
@@ -52,15 +50,20 @@ export class AuthService {
 
   public async googleAuth(body: { googleId: string; email: string; name: string }) {
     const { googleId, email, name } = userGoogleRegistrationSchema.parse(body);
-    const isExistEmail = await this.authDb.getUserByEmail(email);
-    const isExistGoogleId = await this.authDb.getUserByGoogleId(googleId);
 
-    let user;
-    if (isExistEmail || isExistGoogleId) {
-      // If user exist - return user
-      user = isExistEmail || isExistGoogleId;
-    } else {
-      // If user not exist - create user
+    // Check if the user exists by email or Google ID
+    let user = await this.authDb.getUserByEmail(email);
+    const userByGoogleId = await this.authDb.getUserByGoogleId(googleId);
+
+    if (!user && userByGoogleId) {
+      // If user exists by Google ID but not by email, load user by Google ID
+      user = userByGoogleId;
+    } else if (user && !user.googleId) {
+      // If user exists by email but not by Google ID, assign the Google ID to this user
+      await this.authDb.updateGoogleId(user.id, googleId);
+      user.googleId = googleId;
+    } else if (!user) {
+      // If user does not exist, create a new one
       const stripeCustomer = await this.stripeService.createStripeCustomer(email);
       user = await this.authDb.googleAuth({
         googleId,
@@ -71,7 +74,6 @@ export class AuthService {
     }
 
     const tokens = generateTokens(user.id);
-
     return tokens;
   }
 }

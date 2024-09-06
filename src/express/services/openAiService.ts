@@ -58,7 +58,7 @@ export class OpenAiService {
     const getAllMessagesForCheckLenght = await this.openAiDataBase.getMessagesByChatId(chat.id);
     if (getAllMessagesForCheckLenght.length >= 10) {
       const isSubscriprionExist = await this.userDataBase.getSubscriptionByUserId(userId);
-      if (!isSubscriprionExist)
+      if (!isSubscriprionExist || isSubscriprionExist.active === false)
         throw new BadRequestError("For send me more messages or clear message history - You need to buy subscription");
     }
 

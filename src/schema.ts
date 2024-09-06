@@ -19,6 +19,7 @@ export const subscriptions = pgTable("subscriptions", {
   userId: integer("user_id")
     .references(() => users.id)
     .notNull(),
+  subId: varchar("sub_id", { length: 35 }).notNull(),
   startDate: timestamp("start_date").defaultNow().notNull(),
   endDate: timestamp("end_date"),
   active: boolean("active").default(true).notNull(),

@@ -14,6 +14,8 @@ export class UserController extends Controller {
     this.router.get("/profile", extractAccessToken, authenticateToken, this.getProfile);
     this.router.post("/change-details", extractAccessToken, authenticateToken, this.changeProfileDetails);
     this.router.post("/buy-sub", extractAccessToken, authenticateToken, this.createPaymentLink);
+    this.router.post("/update-payment-method", extractAccessToken, authenticateToken, this.updatePaymentMethod);
+    this.router.post("/cancel-subscription", extractAccessToken, authenticateToken, this.cancelSubscription);
   };
 
   private getProfile: RequestHandler = async (req: RequestWithUser, res) => {
@@ -42,5 +44,30 @@ export class UserController extends Controller {
     const paymentUrl = String((await this.userService.getPaymentLink(id)).url);
 
     res.redirect(paymentUrl);
+  };
+
+  private updatePaymentMethod: RequestHandler = async (req: RequestWithUser, res) => {
+    const userId = Number(req.user?.id);
+    const { paymentMethodId } = req.body;
+
+    try {
+      const result = await this.userService.updatePaymentMethod(userId, paymentMethodId);
+      res.status(200).json(result);
+    } catch (error: any) {
+      res.status(400).json({ error: error.raw.message });
+    }
+  };
+
+  private cancelSubscription: RequestHandler = async (req: RequestWithUser, res) => {
+    const userId = Number(req.user?.id);
+
+    // Вызов метода отмены подписки из UserService
+    const result = await this.userService.cancelSubscriptionRenewal(userId);
+
+    if (result.error) {
+      return res.status(400).json(result);
+    }
+
+    return res.status(200).json(result);
   };
 }

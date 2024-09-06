@@ -19,6 +19,7 @@ type InvoicePaidWebhook = {
               start: number;
               end: number;
             };
+            subscription: string;
           }
         ];
       };
@@ -73,6 +74,7 @@ export class WebhookController extends Controller {
 
     const subscriptionsObject = {
       userId: user[0].id,
+      subId: body.data.object.lines.data[0].subscription,
       endDate: new Date(body.data.object.lines.data[0].period.end * 1000),
     };
     await this.db.insert(subscriptions).values(subscriptionsObject);
