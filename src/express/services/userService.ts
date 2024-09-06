@@ -2,6 +2,7 @@ import { UserDataBase } from "database/userDb";
 import { StripeService } from "./stripeService";
 import bcrypt from "bcryptjs";
 import { validateEmail, validateName, validatePassword } from "util/validation";
+import { messages } from "schema";
 
 export class UserService {
   constructor(private userDb: UserDataBase, private stripeService: StripeService) {}
@@ -106,7 +107,6 @@ export class UserService {
         return { error: "No subscription found for this user." };
       }
 
-      // Отмена автопродления подписки через StripeService
       const result = await this.stripeService.cancelSubscriptionAtPeriodEnd(userSubscription.subId);
 
       return { message: "Subscription renewal canceled successfully", result };
@@ -114,6 +114,11 @@ export class UserService {
       console.error("Error canceling subscription renewal:", error);
       return { error: "Failed to cancel subscription renewal." };
     }
+  };
+
+  public getSharedBonusMessages = async (userId: number) => {
+    const result = await this.userDb.getSharedBonusMessages(userId);
+    return { message: "Successful" };
   };
 }
 

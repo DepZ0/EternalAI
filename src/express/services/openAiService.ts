@@ -14,7 +14,13 @@ export class OpenAiService {
     const chatId = chat.id;
 
     const getAllMessagesForCheckLenght = await this.openAiDataBase.getMessagesByChatId(chatId);
-    if (getAllMessagesForCheckLenght.length >= 10) {
+    const user = await this.userDataBase.getUserById(userId);
+
+    //
+    const maxFreeMessagesCount: number = user.sharedBonusMessages === false ? 10 : 16;
+    // In DB we have 2 lines after 1 request, 1 from user and 1 from bot. So 10 = 5 msg, 16 = 5(default free msg) + 3 msg(msg for share link)
+
+    if (getAllMessagesForCheckLenght.length >= maxFreeMessagesCount) {
       const isSubscriprionExist = await this.userDataBase.getSubscriptionByUserId(userId);
       if (!isSubscriprionExist) throw new BadRequestError("For send me more messages - You need to buy subscription");
     }

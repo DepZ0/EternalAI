@@ -38,4 +38,9 @@ export class UserDataBase {
     const user = await this.db.update(users).set(updateData).where(eq(users.id, userId)).returning();
     return user[0];
   }
+
+  public async getSharedBonusMessages(userId: number) {
+    const user = await this.db.update(users).set({ sharedBonusMessages: true }).where(eq(users.id, userId));
+    return;
+  }
 }

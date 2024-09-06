@@ -16,6 +16,7 @@ export class UserController extends Controller {
     this.router.post("/buy-sub", extractAccessToken, authenticateToken, this.createPaymentLink);
     this.router.post("/update-payment-method", extractAccessToken, authenticateToken, this.updatePaymentMethod);
     this.router.post("/cancel-subscription", extractAccessToken, authenticateToken, this.cancelSubscription);
+    this.router.post("/get-bonus-messages", extractAccessToken, authenticateToken, this.getSharedBonusMessages);
   };
 
   private getProfile: RequestHandler = async (req: RequestWithUser, res) => {
@@ -61,7 +62,6 @@ export class UserController extends Controller {
   private cancelSubscription: RequestHandler = async (req: RequestWithUser, res) => {
     const userId = Number(req.user?.id);
 
-    // Вызов метода отмены подписки из UserService
     const result = await this.userService.cancelSubscriptionRenewal(userId);
 
     if (result.error) {
@@ -69,5 +69,16 @@ export class UserController extends Controller {
     }
 
     return res.status(200).json(result);
+  };
+
+  private getSharedBonusMessages: RequestHandler = async (req: RequestWithUser, res) => {
+    const userId = Number(req.user?.id);
+
+    try {
+      const result = await this.userService.getSharedBonusMessages(userId);
+      return res.status(200).json(result);
+    } catch (error) {
+      return res.status(400).json({ error: error });
+    }
   };
 }

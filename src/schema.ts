@@ -10,6 +10,7 @@ export const users = pgTable("users", {
   googleId: varchar("google_id", { length: 255 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  sharedBonusMessages: boolean("shared_bonus_messages").default(false).notNull(),
 });
 
 export type UsersSelect = typeof users.$inferSelect;
