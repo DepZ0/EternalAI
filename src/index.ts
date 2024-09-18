@@ -40,7 +40,7 @@ async function main() {
 
   const userDb = new UserDataBase(db);
   const userService = new UserService(userDb, stripeService);
-  const userController = new UserController(userService);
+  const userController = new UserController(userService, userDb);
 
   const openAiDataBase = new OpenAiDataBase(db);
   const openAiService = new OpenAiService(openAiDataBase, userDb, openai);

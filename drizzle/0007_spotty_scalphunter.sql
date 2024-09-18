@@ -1,0 +1,1 @@
+ALTER TABLE "password_reset" ADD COLUMN "end_date" bigint NOT NULL;

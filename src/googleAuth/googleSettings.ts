@@ -23,3 +23,9 @@ export const GOOGLE_CLIENT_SECRET = "";
 
 // Посилання з секції "Authorized redirect URIs" з кроку #3
 export const GOOGLE_REDIRECT_URI = "http://localhost:3000/auth/google-callback";
+
+// ---
+
+// EMAIL SENDER
+export const GOOGLE_SENDER_EMAIL = "";
+export const GOOGLE_SENDER_EMAIL_PASS = "";

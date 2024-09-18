@@ -29,6 +29,34 @@
       "when": 1725633144121,
       "tag": "0003_cool_silverclaw",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1726235243415,
+      "tag": "0004_fair_abomination",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1726237172485,
+      "tag": "0005_wide_riptide",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1726686655633,
+      "tag": "0006_wooden_lionheart",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1726686700198,
+      "tag": "0007_spotty_scalphunter",
+      "breakpoints": true
     }
   ]
 }

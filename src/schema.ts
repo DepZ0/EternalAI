@@ -1,4 +1,5 @@
-import { pgTable, serial, varchar, text, timestamp, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, timestamp, integer, boolean, bigint } from "drizzle-orm/pg-core";
+import { number } from "zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -51,4 +52,13 @@ export const stripeEvents = pgTable("stripe_events", {
   type: varchar("type", { length: 255 }).notNull(),
   data: text("data").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const passwordReset = pgTable("password_reset", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .references(() => users.id)
+    .notNull(),
+  code: varchar("code", { length: 50 }).notNull(),
+  endDate: bigint("end_date", { mode: "number" }).notNull(),
 });

@@ -1,0 +1,1 @@
+ALTER TABLE "password_reset" DROP COLUMN IF EXISTS "end_date";

@@ -1,8 +1,9 @@
 import { UserDataBase } from "database/userDb";
 import { StripeService } from "./stripeService";
 import bcrypt from "bcryptjs";
-import { validateEmail, validateName, validatePassword } from "util/validation";
-import { messages } from "schema";
+import { emailRegex, validateEmail, validateName, validatePassword } from "util/validation";
+import { ulid } from "ulid";
+import { is } from "drizzle-orm";
 
 export class UserService {
   constructor(private userDb: UserDataBase, private stripeService: StripeService) {}
@@ -120,6 +121,38 @@ export class UserService {
     const result = await this.userDb.getSharedBonusMessages(userId);
     return { message: "Successful" };
   };
+
+  public getUserByEmail = async (email: string) => {
+    const user = await this.userDb.getUserByEmail(email);
+    return user;
+  };
+
+  public genarationResetPasswordLink = async (userId: number) => {
+    let code = ulid();
+    let isExistCode = await this.userDb.getUserByResetCode(code);
+
+    while (isExistCode) {
+      code = ulid();
+      isExistCode = await this.userDb.getUserByResetCode(code);
+    }
+
+    const setCodeToDb = await this.userDb.getSetPasswordResetCode(userId, code);
+
+    return code;
+  };
+
+  public checkResetPasswordCode = async (userId: number, code: string) => {
+    const existCode = await this.userDb.getUserByResetCode(code);
+
+    if (userId === existCode.userId) {
+      return true;
+    }
+    return false;
+  };
+
+  // Сгенерили код и проверили есть ли еще такой код, теперь нужно проверить дату експайра и подключить в контроллер
+  // Создать эндпоинт для получения кода, создать эндпоинт для проверки кода (в проверке нужно проверить есть ли такой код у этого юзера и его время экспаера)
+  // Еще 1 ендпоинт в который примит в себя код и новый пароль
 }
 
 export type NewUser = {

@@ -5,6 +5,10 @@ export const userRegistrationSchema = z.object({
   password: z.string().min(6, { message: "password should contain more than 6 characters" }),
 });
 
+export const userPasswordForReesetSchema = z.object({
+  newPassword: z.string().min(6, { message: "password should contain more than 6 characters" }),
+});
+
 export const userGoogleRegistrationSchema = z.object({
   name: z.string().min(1).max(60),
   email: z.string().email().min(1),

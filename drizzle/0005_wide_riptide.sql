@@ -1,0 +1,1 @@
+ALTER TABLE "password_reset" ALTER COLUMN "end_date" SET DATA TYPE bigint;
